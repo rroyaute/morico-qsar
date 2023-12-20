@@ -1,7 +1,7 @@
 # Fonction pour chute libre avec frottements
 
 freefallin_fun = function(g, m, c, t) {
-  v = (g * m)/c * (1 - exp(-c/m)/t)
+  v = (g * m)/c * (1 - exp(-c/m*t))
   return(v)
 }
 

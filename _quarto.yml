@@ -1,3 +1,3 @@
 project:
   type: website
-  output-dir: public
+  output-dir: docs

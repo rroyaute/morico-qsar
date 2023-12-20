@@ -1,0 +1,155 @@
+---
+title: "Introduction aux rapports reproductibles avec Quarto"
+author: "Raphaël Royauté"
+date: last-modified
+
+
+format: 
+  html:
+    code-fold: true
+    fig-cap-location: bottom
+    shift-heading-level-by: 1
+    embed-resources: true
+toc: true
+toc-depth: 5
+toc-location: left
+execute:
+  echo: true
+  warning: false
+  message: false
+editor: 
+  markdown: 
+    wrap: sentence
+---
+
+```{r}
+#| eval: true
+#| echo: false
+# Importation des packages
+# Utilisation des options echo et eval pour masquer ce bout de code dans le rapport final
+library(tidyverse); library(here); library(viridis)
+```
+
+
+
+## Rapports reproductibles
+Un rapport reproductible vous permet de combiner du format texte avec votre code et leurs sorties (images, animations, tableau). C'est un format très pratique pour mettre au propre vos résultats et accompagner l'utilisateur sur les différentes étapes de mise en place de vos modèle. Ici j'utilise le système [Quarto](https://quarto.org/) qui est fourni directement à l'installation de RStudio. Vous trouverez plus d'informations sur les fonctions de base de Quarto avec RStudio dans ce [tutoriel](https://quarto.org/docs/get-started/hello/rstudio.html). 
+
+Dans les sections suivantes je reprends les scripts `sims_freefallin.R` et `sims_logKow` en format tutoriel pas à pas.
+
+## Conseils d'utilisation
+J'ai crée un dépôt github 'template' que vous pouvez utiliser à votre convenance: [rroyaute/gh-template-rr](https://github.com/rroyaute/gh-template-rr/tree/main). Vous pouvez créer votre dépot sur la base de ce template en cliquant sur le bouton "Use this template" [](img/gh-template.JPG). Une fois vos analyses termninés,  remplissez le document `outputs\quarto\index.qmd` et exportez le vous pouvez les exporter au format voulut (cf. [Quarto Authoring](https://quarto.org/docs/get-started/authoring/rstudio.html) pour plus d'information sur l'export de documents). 
+
+## Tutoriel 1: Simulations pour un objet en chute libre
+Comme vu en cours, la vélosité d'un corps en chute libre avec frottements a une solution analytique de la forme $v(t)= \frac{gm}{c} (1 - e^{-(c/m)t})$. 
+
+
+### Exprimer le problème en code
+Nous pouvons facilement traduire cette expression en fonction `R` qui nous retourne une valeure de vélocité pour chaque pas de temps
+
+```{r}
+# Fonction pour chute libre avec frottements
+
+freefallin_fun = function(g, m, c, t) {
+  v = (g * m)/c * (1 - exp(-c/m*t))
+  return(v)
+}
+```
+
+Par exemple, un parachutiste de 80 kg atteindra une vitesse de chute de 50 m/s dès 10 secondes de chute libre
+
+```{r}
+# test
+out = freefallin_fun(g = 9.81, m = 80, c = 12.5, t = 1:10)
+plot(t, out)
+```
+
+### Simuler le comportement du modèle
+
+Nous pouvons maintenant interroger le modèle pour comprendre comment la masse du parachutiste influence sa vitesse en chute libre. POur cela, nous allons définir une série de masse corporelle à stocker dans un vecteur et appliquer notre fonction sur chaque élément du vecteur à l'aide de la fonction `lapply()`
+
+```{r}
+# Importer la fonction
+source(here("R/funs/freefallin_fun.R"))
+
+# Définir les paramètres
+g = 9.81
+c = 12.5
+t = 1:10
+
+# Parachutiste de 40 à 120 kg
+m_range = c(40:120)
+
+# appliquer la fonction pour chaque valeur de paramètre
+# Stocker chaque vélocité dans liste
+out = lapply(m_range, freefallin_fun, g = g, c = c, t = t)
+out[1:2] # Afficher les 2 premiers éléments de la liste
+```
+
+Nous pouvons ensuite stocker ces informations sous forme de `dataframe` pour les représenter plus facilement à l'aide de `ggplot`
+
+```{r}
+df = data.frame(
+  m = rep(m_range, each = length(t)), # valeur de masse répétée à chaque pas de temps
+  t = rep(t, length(m_range)), # temps répétée pour chaque masse
+  v = unlist(out) # vélositées mises bout à bout
+  )
+
+df %>% 
+  ggplot(aes(x = t, y = v, group = m, color = m)) +
+  geom_point() +
+  geom_line() +
+  scale_color_viridis(option = "H") +
+  xlab("Temps (s)") +
+  ylab("Vélocité (m/s)") +
+  theme_bw(16)
+```
+
+## Tutoriel 2: Simulations d'un modèle QSAR
+Nous avons également vu comment simuler la relation entre toxicité et lipophilie des contaminants à l'aide d'un modèle QSAR de la forme:
+
+$$
+toxicité = 1 / LC_{50} \\
+log(K_{ow}) \sim N(\mu_{Kow}, \sigma_{Kow}) \\
+toxicité  \sim N(\mu_{toxicité}, \sigma_{toxicité}) \\
+\mu_{toxicité} = \beta_0 + \beta_1 log(K_{ow}) \\
+$$
+
+### Stockage des paramètres
+
+```{r}
+n_compo = 100 # nombre de composés
+b0 = -4 # Ordonnée à l'origine
+b1 = .9 # Pente
+sigma = .25 # variance résiduelle
+```
+
+D'après la figure 1 de [Könemann 1981](https://doi.org/10.1016/0300-483X(81)90130-X), le coefficient de partage des molécules considérées (log(Kow)) peut être approximé par une loi normale d emoyenne 2 et un écart type de 1. Avec la fonction `rnorm()`, nous pouvons simuler 100 molécules selon cette loi.
+
+```{r}
+logKow = rnorm(n_compo, 2, 1)  # vecteur de Kow
+```
+
+Pour simuler l'effet de log(Kow) sur la valeure de toxicité, il suffit d'appliquer la fonction `rnorm()` à nouveau, cette fois sur le vecteur de valeures de log(Kow) et en appliquant la formule linéaire reliant la toxicité à Kow:
+
+```{r}
+log_inv_LC50 = rnorm(n_compo, b0 + b1 * logKow, sigma)
+```
+
+Stockons ces données dans un dataframe pour pouvoir les représenter graphiquement
+
+```{r}
+df = data.frame( # stockage
+  logKow = logKow,
+  log_inv_LC50 = log_inv_LC50
+) 
+
+plot(log_inv_LC50 ~ logKow, df)
+```
+
+
+
+
+
+## Exporter les tutoriels sous forme de page web
+Maintenant que nous avons fini d'exposer nos simulations et leurs résulats, nous pouvons facilement exporter notre document quarto au format voulu, ici une page html. Pour ce faire, le plus simple est d'utiliser l'incantation `quarto render` puis `git push` directement dans le terminal. 

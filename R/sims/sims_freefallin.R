@@ -15,7 +15,7 @@ t = 1:10
 m_range = c(40:120)
 
 # appliquer la fonction pour chaque valeur de paramètre
-# Stocker chaque vélosité dans liste
+# Stocker chaque vélocité dans liste
 out = lapply(m_range, freefallin_fun, g = g, c = c, t = t)
 
 df = data.frame(
