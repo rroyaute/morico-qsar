@@ -35,10 +35,10 @@ library(tidyverse); library(here); library(viridis)
 ## Rapports reproductibles
 Un rapport reproductible vous permet de combiner du format texte avec votre code et leurs sorties (images, animations, tableau). C'est un format très pratique pour mettre au propre vos résultats et accompagner l'utilisateur sur les différentes étapes de mise en place de vos modèle. Ici j'utilise le système [Quarto](https://quarto.org/) qui est fourni directement à l'installation de RStudio. Vous trouverez plus d'informations sur les fonctions de base de Quarto avec RStudio dans ce [tutoriel](https://quarto.org/docs/get-started/hello/rstudio.html). 
 
-Dans les sections suivantes je reprends les scripts `sims_freefallin.R` et `sims_logKow` en format tutoriel pas à pas.
+Dans les sections suivantes je reprends les scripts `sims_freefallin.R` et `sims_logKow.R` en format tutoriel pas à pas.
 
 ## Conseils d'utilisation
-J'ai crée un dépôt github 'template' que vous pouvez utiliser à votre convenance: [rroyaute/gh-template-rr](https://github.com/rroyaute/gh-template-rr/tree/main). Vous pouvez créer votre dépot sur la base de ce template en cliquant sur le bouton "Use this template" [](img/gh-template.JPG). Une fois vos analyses termninés,  remplissez le document `outputs\quarto\index.qmd` et exportez le vous pouvez les exporter au format voulut (cf. [Quarto Authoring](https://quarto.org/docs/get-started/authoring/rstudio.html) pour plus d'information sur l'export de documents). 
+J'ai crée un dépôt github 'template' que vous pouvez utiliser à votre convenance: [rroyaute/gh-template-rr](https://github.com/rroyaute/gh-template-rr/tree/main). Vous pouvez créer votre dépot sur la base de ce template en cliquant sur le bouton "Use this template" ![](img/gh-template.JPG). Une fois vos analyses termninés,  remplissez le document `outputs\quarto\index.qmd` et exportez le vous pouvez les exporter au format voulut (cf. [Quarto Authoring](https://quarto.org/docs/get-started/authoring/rstudio.html) pour plus d'information sur l'export de documents). 
 
 ## Tutoriel 1: Simulations pour un objet en chute libre
 Comme vu en cours, la vélosité d'un corps en chute libre avec frottements a une solution analytique de la forme $v(t)= \frac{gm}{c} (1 - e^{-(c/m)t})$. 
@@ -61,7 +61,7 @@ Par exemple, un parachutiste de 80 kg atteindra une vitesse de chute de 50 m/s d
 ```{r}
 # test
 out = freefallin_fun(g = 9.81, m = 80, c = 12.5, t = 1:10)
-plot(t, out)
+plot(x = 1:10, y = out, xlab = "temps (s)", ylab = "vitesse (m/s)")
 ```
 
 ### Simuler le comportement du modèle
@@ -109,10 +109,12 @@ df %>%
 Nous avons également vu comment simuler la relation entre toxicité et lipophilie des contaminants à l'aide d'un modèle QSAR de la forme:
 
 $$
-toxicité = 1 / LC_{50} \\
-log(K_{ow}) \sim N(\mu_{Kow}, \sigma_{Kow}) \\
-toxicité  \sim N(\mu_{toxicité}, \sigma_{toxicité}) \\
-\mu_{toxicité} = \beta_0 + \beta_1 log(K_{ow}) \\
+\begin{aligned}
+toxicité &= 1 / LC_{50} \\
+log(K_{ow}) &\sim N(\mu_{Kow}, \sigma_{Kow}) \\
+toxicité  &\sim N(\mu_{toxicité}, \sigma_{toxicité}) \\
+\mu_{toxicité} &= \beta_0 + \beta_1 log(K_{ow}) \\
+\end{aligned}
 $$
 
 ### Stockage des paramètres
@@ -146,10 +148,6 @@ df = data.frame( # stockage
 
 plot(log_inv_LC50 ~ logKow, df)
 ```
-
-
-
-
 
 ## Exporter les tutoriels sous forme de page web
 Maintenant que nous avons fini d'exposer nos simulations et leurs résulats, nous pouvons facilement exporter notre document quarto au format voulu, ici une page html. Pour ce faire, le plus simple est d'utiliser l'incantation `quarto render` puis `git push` directement dans le terminal. Utilisez les instructions [ici](https://quarto.org/docs/publishing/github-pages.html) pour finaliser l'affichage de la page sur github.
