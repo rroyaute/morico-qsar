@@ -30,8 +30,6 @@ editor:
 library(tidyverse); library(here); library(viridis)
 ```
 
-
-
 ## Rapports reproductibles
 Un rapport reproductible vous permet de combiner du format texte avec votre code et leurs sorties (images, animations, tableau). C'est un format très pratique pour mettre au propre vos résultats et accompagner l'utilisateur sur les différentes étapes de mise en place de vos modèle. Ici j'utilise le système [Quarto](https://quarto.org/) qui est fourni directement à l'installation de RStudio. Vous trouverez plus d'informations sur les fonctions de base de Quarto avec RStudio dans ce [tutoriel](https://quarto.org/docs/get-started/hello/rstudio.html). 
 
@@ -66,7 +64,7 @@ plot(x = 1:10, y = out, xlab = "temps (s)", ylab = "vitesse (m/s)")
 
 ### Simuler le comportement du modèle
 
-Nous pouvons maintenant interroger le modèle pour comprendre comment la masse du parachutiste influence sa vitesse en chute libre. POur cela, nous allons définir une série de masse corporelle à stocker dans un vecteur et appliquer notre fonction sur chaque élément du vecteur à l'aide de la fonction `lapply()`
+Nous pouvons maintenant interroger le modèle pour comprendre comment la masse du parachutiste influence sa vitesse en chute libre. Pour cela, nous allons définir une série de masse corporelle à stocker dans un vecteur et appliquer notre fonction sur chaque élément du vecteur à l'aide de la fonction `lapply()`
 
 ```{r}
 # Importer la fonction
@@ -126,7 +124,7 @@ b1 = .9 # Pente
 sigma = .25 # variance résiduelle
 ```
 
-D'après la figure 1 de [Könemann 1981](https://doi.org/10.1016/0300-483X(81)90130-X), le coefficient de partage des molécules considérées (log(Kow)) peut être approximé par une loi normale d emoyenne 2 et un écart type de 1. Avec la fonction `rnorm()`, nous pouvons simuler 100 molécules selon cette loi.
+D'après la figure 1 de [Könemann 1981](https://doi.org/10.1016/0300-483X(81)90130-X), le coefficient de partage des molécules considérées (log(Kow)) peut être approximé par une loi normale de moyenne 2 et un écart type de 1. Avec la fonction `rnorm()`, nous pouvons simuler 100 molécules selon cette loi.
 
 ```{r}
 logKow = rnorm(n_compo, 2, 1)  # vecteur de Kow
