@@ -152,4 +152,4 @@ plot(log_inv_LC50 ~ logKow, df)
 
 
 ## Exporter les tutoriels sous forme de page web
-Maintenant que nous avons fini d'exposer nos simulations et leurs résulats, nous pouvons facilement exporter notre document quarto au format voulu, ici une page html. Pour ce faire, le plus simple est d'utiliser l'incantation `quarto render` puis `git push` directement dans le terminal. 
+Maintenant que nous avons fini d'exposer nos simulations et leurs résulats, nous pouvons facilement exporter notre document quarto au format voulu, ici une page html. Pour ce faire, le plus simple est d'utiliser l'incantation `quarto render` puis `git push` directement dans le terminal. Utilisez les instructions [ici](https://quarto.org/docs/publishing/github-pages.html) pour finaliser l'affichage de la page sur github.
