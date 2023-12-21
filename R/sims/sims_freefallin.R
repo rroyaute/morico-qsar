@@ -7,9 +7,9 @@ library(tidyverse); library(viridis)
 source("R/funs/freefallin_fun.R")
 
 # Définir les paramètres
-g = 9.81
-c = 12.5
-t = 1:10
+g = 9.81 # constante gravitationelle
+c = 12.5 # 
+t = 0:10
 
 # Parachutiste de 40 à 120 kg
 m_range = c(40:120)

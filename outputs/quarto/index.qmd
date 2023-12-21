@@ -58,8 +58,8 @@ Par exemple, un parachutiste de 80 kg atteindra une vitesse de chute de 50 m/s d
 
 ```{r}
 # test
-out = freefallin_fun(g = 9.81, m = 80, c = 12.5, t = 1:10)
-plot(x = 1:10, y = out, xlab = "temps (s)", ylab = "vitesse (m/s)")
+out = freefallin_fun(g = 9.81, m = 80, c = 12.5, t = 0:10)
+plot(x = 0:10, y = out, xlab = "temps (s)", ylab = "vitesse (m/s)")
 ```
 
 ### Simuler le comportement du modèle
@@ -73,7 +73,7 @@ source(here("R/funs/freefallin_fun.R"))
 # Définir les paramètres
 g = 9.81
 c = 12.5
-t = 1:10
+t = 0:10
 
 # Parachutiste de 40 à 120 kg
 m_range = c(40:120)
